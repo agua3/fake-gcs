@@ -4,6 +4,8 @@
 
 package backend
 
+import "path/filepath"
+
 // Object represents the object that is stored within the fake server.
 type Object struct {
 	BucketName string `json:"-"`
@@ -15,5 +17,5 @@ type Object struct {
 
 // ID is useful for comparing objects
 func (o *Object) ID() string {
-	return o.BucketName + "/" + o.Name
+	return filepath.Join(o.BucketName, o.Name)
 }

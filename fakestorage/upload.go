@@ -101,7 +101,11 @@ func encodedMd5Hash(content []byte) string {
 	return encodedHash(md5Hash(content))
 }
 
-func (s *Server) multipartUpload(bucketName string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) multipartUpload(
+	bucketName string,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	defer r.Body.Close()
 	_, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
@@ -138,7 +142,11 @@ func (s *Server) multipartUpload(bucketName string, w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(obj)
 }
 
-func (s *Server) resumableUpload(bucketName string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) resumableUpload(
+	bucketName string,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	objName := r.URL.Query().Get("name")
 	if objName == "" {
 		metadata, err := loadMetadata(r.Body)
