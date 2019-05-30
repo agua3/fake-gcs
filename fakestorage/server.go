@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/storage"
-	"github.com/fsouza/fake-gcs-server/internal/backend"
+	"github.com/agua3/fake-gcs/internal/backend"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/option"
 )

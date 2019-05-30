@@ -12,10 +12,6 @@ env:
     - GOPROXY=https://proxy.golang.org
     - GO111MODULE=on
 go:
-  - 1.11.x
   - 1.12.x
-  - tip
 matrix:
   fast_finish: true
-  allow_failures:
-    - go: tip
