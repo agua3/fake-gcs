@@ -55,6 +55,7 @@ type Options struct {
 	StorageRoot    string
 	Host           string
 	Port           uint16
+	Verbose        bool
 
 	// when set to true, the server will not actually start a TCP listener,
 	// client requests will get processed by an internal mocked transport.
@@ -67,12 +68,13 @@ func NewServerWithOptions(options Options) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if options.NoListener {
 		s.setTransportToMux()
 		return s, nil
 	}
 
-	s.ts = httptest.NewUnstartedServer(requestLogger(s.mux))
+	s.ts = httptest.NewUnstartedServer(requestLogger(s.mux, options.Verbose))
 	if options.Port != 0 {
 		addr := fmt.Sprintf("%s:%d", options.Host, options.Port)
 		l, err := net.Listen("tcp", addr)
@@ -180,10 +182,13 @@ func (s *Server) buildMuxer() {
 		HandlerFunc(s.downloadObject)
 }
 
-func requestLogger(targetMux http.Handler) http.Handler {
+func requestLogger(targetMux http.Handler, verbose bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		now := time.Now().Format(time.RFC1123)
-		fmt.Printf("%s - [%s] %s\n", now, r.Method, r.RequestURI)
+		if verbose {
+			now := time.Now().Format(time.RFC1123)
+			fmt.Printf("%s - [%s] %s\n", now, r.Method, r.RequestURI)
+		}
+
 		targetMux.ServeHTTP(w, r)
 	})
 }

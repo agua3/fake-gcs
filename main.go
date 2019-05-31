@@ -6,12 +6,9 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/agua3/fake-gcs/fakestorage"
-)
-
-const (
-	defaultStorageRoot string = "storage"
 )
 
 const (
@@ -20,9 +17,17 @@ const (
 )
 
 var (
-	storageRoot = getEnv("STORAGE_ROOT", defaultStorageRoot)
+	verbose     = getEnvBool("VERBOSE", false)
+	storageRoot = getEnv("STORAGE_ROOT", "storage")
 	rootDir     = path.Join("/", storageRoot)
 )
+
+func getEnvBool(env string, defaultValue bool) bool {
+	strVerbose := getEnv("VERBOSE", "false")
+	boolVerbose, _ := strconv.ParseBool(strVerbose)
+
+	return boolVerbose
+}
 
 func getEnv(env string, defaultValue string) string {
 	if value, exists := os.LookupEnv(env); exists {
@@ -113,6 +118,7 @@ func main() {
 		Host:           serverHost,
 		Port:           serverPort,
 		StorageRoot:    rootDir,
+		Verbose:        verbose,
 	})
 
 	if err != nil {
