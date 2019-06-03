@@ -93,6 +93,39 @@ func newObjectRewriteResponse(obj Object) rewriteResponse {
 	}
 }
 
+func newListObjectACLsResponse(objs []ObjectACL) listResponse {
+	resp := listResponse{
+		Kind:  "storage#objectAccessControls",
+		Items: make([]interface{}, len(objs)),
+	}
+
+	for i, obj := range objs {
+		resp.Items[i] = newObjectACLResponse(obj)
+	}
+
+	return resp
+}
+
+type objectACLResponse struct {
+	Kind   string `json:"kind"`
+	ID     string `json:"id"`
+	Bucket string `json:"bucket"`
+	Object string `json:"object"`
+	Entity string `json:"entity"`
+	Role   string `json:"role"`
+}
+
+func newObjectACLResponse(obj ObjectACL) objectACLResponse {
+	return objectACLResponse{
+		Kind:   "storage#objectAccessControl",
+		ID:     obj.id(),
+		Bucket: obj.BucketName,
+		Object: obj.ObjectName,
+		Entity: "allUsers",
+		Role:   "OWNER",
+	}
+}
+
 type errorResponse struct {
 	Error httpError `json:"error"`
 }
