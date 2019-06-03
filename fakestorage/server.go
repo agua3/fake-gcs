@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sync"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/agua3/fake-gcs/internal/backend"
@@ -71,7 +72,7 @@ func NewServerWithOptions(options Options) (*Server, error) {
 		return s, nil
 	}
 
-	s.ts = httptest.NewUnstartedServer(s.mux)
+	s.ts = httptest.NewUnstartedServer(requestLogger(s.mux))
 	if options.Port != 0 {
 		addr := fmt.Sprintf("%s:%d", options.Host, options.Port)
 		l, err := net.Listen("tcp", addr)
@@ -177,6 +178,14 @@ func (s *Server) buildMuxer() {
 		Path("/{bucketName}/{objectName:.+}").
 		Methods("GET").
 		HandlerFunc(s.downloadObject)
+}
+
+func requestLogger(targetMux http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		now := time.Now().Format(time.RFC1123)
+		fmt.Printf("%s - [%s] %s\n", now, r.Method, r.RequestURI)
+		targetMux.ServeHTTP(w, r)
+	})
 }
 
 // Stop stops the server, closing all connections.
